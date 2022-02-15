@@ -1,0 +1,54 @@
+const express = require('express');
+const auth = require('../../middlewares/auth');
+const stockRecordController = require('./stockRecordContoller');
+const { checkSchema, body } = require('express-validator');
+const router = express.Router();
+
+router.post('/create',
+        checkSchema({
+          date: {
+                  trim: true,
+                  notEmpty: true,
+                  errorMessage: 'Date is required',
+          },
+          typeOfFish:{
+              notEmpty: true,
+              errorMessage: "Type of feed field should not be empty"
+          },
+          sizeOfFish:{
+            notEmpty: true,
+            errorMessage: "Size of feed field should not be empty"
+          },
+          returnedFish:{
+            notEmpty: true,
+            errorMessage: "Type of transaction field should not be empty"
+          },
+          spoiltFish:{
+            notEmpty: true,
+            errorMessage: "Quantity of feed field should not be empty"
+          },
+          quantityFish:{
+            notEmpty: true,
+            errorMessage: "Type of transaction field should not be empty"
+          },
+          
+        }),stockRecordController.createstockRecord);
+
+//Get all data
+router.get('/all', stockRecordController.getstockRecord);
+
+//Get STOCK RECORD by ID
+router.get('/:stockRecordId', stockRecordController.getstockRecordById);
+
+//Update stockRecord by ID
+/*  update the STOCK RECORD  */
+router
+    .post('/updatestockRecord/:stockRecordId',stockRecordController.updatestockRecord);
+
+router.delete(
+  '/:stockRecordId',
+  stockRecordController.deletestockRecord
+);
+
+module.exports = router;
+          

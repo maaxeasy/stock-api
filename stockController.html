@@ -1,0 +1,149 @@
+const httpStatus = require("http-status");
+const { errorLogger } = require("../../config/logger");
+const { validationResult } = require("express-validator");
+const { userService, tokenService, authService } = require("../../services");
+const stockRecord = require("./stockRecord");
+const Admin = require("../Admin/admin")
+const User = require('../../models/user')
+
+const createstockRecord = async (req, res) => {
+  try {
+    const validationErrors = validationResult(req);
+
+    if (!validationErrors.isEmpty()) {
+      return res
+        .status(400)
+        .json({ success: false, errors: validationErrors.array() });
+    }
+
+    const newstockRecord = await stockRecord.create(req.body);
+    return res
+      .status(200)
+      .json({ success: true, message: "success", newstockRecord });
+  } catch (e) {
+    errorLogger.error(e.message);
+    return res
+      .status(500)
+      .json({ success: false, error: "Internal server error" });
+  }
+};
+
+const getstockRecord = async (req, res) => {
+  try {
+    const val = await stockRecord.find();
+
+    if (val instanceof Error) {
+      return res.json({
+        success: false,
+        error: val.message,
+      });
+    }
+
+    return res.status(200).json({ success: true, stockRecord: val });
+  } catch (e) {
+    errorLogger.error(e.message);
+
+    res.status(500).json({ success: false, error: "internal server error" });
+  }
+};
+
+const getstockRecordById = async (req, res) => {
+  try {
+    const val = await stockRecord.findOne({
+      _id: req.params.stockRecordId,
+    });
+
+    if (val instanceof Error) {
+      return res.json({
+        success: false,
+        error: u.message,
+      });
+    }
+    if (!val) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          stockRecord: "No such stockRecord with that ID found",
+        });
+    }
+
+    res.status(200).json({ success: true, stockRecord: val });
+  } catch (e) {
+    errorLogger.error(e.message);
+
+    res.status(500).json({ success: false, error: "internal server error" });
+  }
+};
+
+const updatestockRecord = async (req, res) => {
+  try {
+    var u = await stockRecord.findOne({ _id: req.params.stockRecordId });
+    if (u instanceof Error) {
+      return res.status(400).json({
+        success: false,
+        error: u.message,
+      });
+    }
+    if (!u) {
+      return res.status(400).json({
+        success: false,
+        error: "No such stockRecord with the ID found",
+      });
+    }
+
+    u.name = req.body.name;
+
+    const result = await u.save();
+    if (result instanceof Error) {
+      return res.status(400).json({
+        success: false,
+        error: result.message,
+      });
+    }
+    res.status(200).json({ success: true, stockRecord: result });
+  } catch (e) {
+    errorLogger.error(e.message);
+    res.status(500).json({ success: false, error: "Internal server error" });
+  }
+};
+
+const deletestockRecord = async (req, res) => {
+  try {
+    var u = await stockRecord.findOne({ _id: req.params.stockRecordId });
+    if (u instanceof Error) {
+      return res.status(400).json({
+        success: false,
+        error: u.message,
+      });
+    }
+    if (!u) {
+      return res.status(400).json({
+        success: false,
+        error: "No such stockRecord with the ID found",
+      });
+    }
+
+    const result = await stockRecord.deleteOne({
+      _id: req.params.stockRecordId,
+    });
+    if (result instanceof Error) {
+      return res.status(400).json({
+        success: false,
+        error: result.message,
+      });
+    }
+    res.status(200).json({ success: true, stockRecord: u });
+  } catch (e) {
+    errorLogger.error(e.message);
+    res.status(500).json({ success: false, error: "Internal server error" });
+  }
+};
+
+module.exports = {
+  createstockRecord,
+  getstockRecordById,
+  updatestockRecord,
+  deletestockRecord,
+  getstockRecord,
+};

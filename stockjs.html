@@ -1,0 +1,40 @@
+const mongoose = require('mongoose');
+const validator = require('validator');
+const bcrypt = require('bcryptjs');
+const { toJSON, paginate } = require('../../models/plugins');
+
+const schema = mongoose.Schema({
+    date: {
+    type: Date,
+    required: true,
+    trim: true,
+    },
+    typeOfFish: {
+        type: String,
+        required: true
+    },
+    sizeOfFish: {
+        type: Number,
+        required: true
+    },
+    returedFish:{
+        type: Number,
+        required: true
+    },
+    spoiltFish:{
+        type: Number,
+        required: true
+    },
+    quantityOfFish: {
+        type: Number,
+        required: true
+    }
+})
+
+
+
+schema.plugin(toJSON);
+
+const stockRecord = mongoose.model('stockRecord', schema);
+
+module.exports = stockRecord;
